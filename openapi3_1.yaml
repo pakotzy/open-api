@@ -1,0 +1,151 @@
+openapi: 3.1.0
+info:
+  title: Gym
+  description: A set of workout centric endpoints
+  version: 0.0.1
+servers: 
+  - url: http://localhost:8080
+    description: Local
+tags:
+  - name: workouts
+    description: Operations with workouts
+paths:
+  /workouts:
+    get:
+      tags:
+        - workouts
+    post:
+      tags:
+        - workouts
+  /workouts/{id}:
+    parameters:
+      - name: id
+        description: Unique identifier of a workout
+        in: path
+        required: true
+        schema:
+          type: integer
+          description: Unique identifier of a workout
+          minimum: 0
+          examples: 
+            - 0
+    get:
+      tags:
+        - workouts
+      summary: Retrieve all information about specific workout
+      description: Takes workout id from path parameter, finds all information about this specific workout and returns it
+      operationId: getWorkoutById
+      responses: 
+        '200':
+          description: Succesfully found workout information
+          content: 
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/workout'
+        '404':
+          description: Workout information does not exist
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  textKey:
+                    description: Text key used to internationalize and present a human readable message
+                    type: string
+                    examples: 
+                      - WORKOUT_NOT_FOUND
+                  reason:
+                      description: Immediate root cause of the problem in developer centric format
+                      type: string
+                      examples:
+                          - Could not find a workout by the given id
+components: 
+  schemas: 
+    workout:
+      description: Information about completed workout
+      type: object
+      properties:
+        startedAt:
+          description: Date and time when the workout has been started
+          type: string
+          format: date-time
+          examples: 
+            - 2024-01-02T11:40:59.930Z
+        finishedAt:
+          description: Date and time when the workout has been completed
+          type: string
+          format: date-time
+          examples: 
+            - 2024-01-02T12:20:59.930Z
+        restPeriod:
+          description: Amount of seconds for rest between the exercises
+          type: integer
+          minimum: 0
+          examples:
+            - 60
+        exercises:
+          description: A set of actions performed to achieve athletic goals during this specific workout
+          type: array
+          items:
+            $ref: '#/components/schemas/exercise'
+    exercise:
+      description: Action performed to achieve athletic goals with its properties
+      type: object
+      properties: 
+        movement:
+          $ref: '#/components/schemas/movement'
+        restPeriod:
+          decription: Amount of seconds for rest between the sets
+          type: integer
+          minimum: 0
+          examples:
+            - 60
+        sets:
+            description: List of attemps performing the exercise
+            type: array
+            items: 
+              $ref: '#/components/schemas/set'
+        comment:
+          description: Feelings noticed after completion of a movement
+          type: string
+          examples:
+            - Just enough for now. Continue like this the next time.
+    movement:
+        description: Information about a specific movement
+        type: object
+        properties: 
+          id:
+            description: Unique identifier of the movement
+            type: integer
+            minimum: 0
+            examples:
+              - 0
+          name:
+            description: The name of the movement
+            type: string
+            examples:
+              - Deadlifts
+              - Shoulder press
+              - Burpees
+          instructions:
+            description: Detailed instructions on how to perform the exercise
+            type: string
+            examples:
+              - Hold dumbells in front of you and as close as possible to the body. Perform a downward movement making sure to keep back straight. Perform an upword movement to return back to the starting position.
+              - https://www.youtube.com/watch?v=MeIiIdhvXT4&t=58s
+    set:
+      type: object
+      properties: 
+        reps:
+          description: Amount of repetitions of the exercise during the set
+          type: integer
+          minimum: 0
+          examples:
+            - 20
+        weight:
+          description: Amount of added weight to the exercise during the set
+          type: integer
+          minimum: 0
+          examples:
+            - 0
+            - 17
